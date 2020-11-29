@@ -7,3 +7,5 @@ Version History
   - version 1.0 : November 29, 2020
   - version 1.1 : On-going
  
+ Issues:
+  - Plus Minus haven't been configured
