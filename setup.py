@@ -11,11 +11,13 @@ APP_NAME = "Simple Calculator"
 
 class GUI:
     def __init__(self, author):
-        self.variable = ''
-        self.variable_main = 0
+        self.variable_one = ''
+        self.variable_two = ''
+        self.variable_text = ''
+        self.operator = ''
+    
         self.title = author
         self.size = '350x380'
-        self.symbol = ''
 
         self.bg_main = "#1F1F1F"
         self.bg_one = "#FFFFFF"
@@ -24,57 +26,62 @@ class GUI:
         self.bg_four = "#060606"
         self.bg_five = "#31302F"
 
-    def clear_variable(self):
-        self.variable = ''
-        self.variable_main = 0
-        self.symbol = ''
-        variable_one.set(self.variable)
-
-    def set_value(self, symbol=''):
-        if symbol != '':
-            if True:
-                if self.variable_main == 0:
-                    self.variable_main = self.variable
-                if self.symbol == '+':
-                    self.variable_main = float(self.variable_main) + float(self.variable)
-                if self.symbol == '-':
-                    self.variable_main = float(self.variable_main) - float(self.variable)
-                if self.symbol == '×':
-                    self.variable_main = float(self.variable_main) * float(self.variable)
-                if self.symbol == '÷':
-                    self.variable_main = float(self.variable_main) / float(self.variable)
-                self.variable = ''
-                self.symbol = symbol
-            if symbol == '√x':
-                self.variable = float(self.variable_main) ** (1 / 2)
-                self.symbol = ''
-                self.variable_main = 0
-            elif symbol == '1/x':
-                self.variable = 1 / float(self.variable_main)
-                self.symbol = ''
-                self.variable_main = 0
-            elif symbol == 'x*2':
-                self.variable = float(self.variable_main) ** 2
-                self.symbol = ''
-                self.variable_main = 0
-            variable_one.set(self.variable)
-        if symbol == '':
-            if self.symbol == '+':
-                self.variable = float(self.variable_main) + float(self.variable)
-            if self.symbol == '-':
-                self.variable = float(self.variable_main) - float(self.variable)
-            if self.symbol == '×':
-                self.variable = float(self.variable_main) * float(self.variable)
-            if self.symbol == '÷':
-                self.variable = float(self.variable_main) / float(self.variable)
-            self.variable_main = 0
-            variable_one.set(self.variable)
-            self.symbol = symbol
-
     def set_variable(self, variable):
-        self.variable = str(self.variable) + str(variable)
-        variable_one.set(self.variable)
+        if self.operator == '': # Set Variable One
+            if self.variable_one == '' and variable == '.':
+                self.variable_one = str(0) + str(variable)
+                self.variable_text = self.variable_one
+            if self.variable_one.find('.') != -1 and variable == '.':
+                pass
+            else:
+                self.variable_one = str(self.variable_one) + str(variable)
+                self.variable_text = self.variable_one
+        else: # Set Variable Two
+            if self.variable_two == '' and variable == '.':
+                self.variable_two = str(0) + str(variable)
+                self.variable_text = self.variable_two
+            if self.variable_two.find('.') != -1 and variable == '.':
+                pass
+            else:
+                self.variable_two = str(self.variable_two) + str(variable)
+                self.variable_text = self.variable_two
+        display.set(self.variable_text)
+        
+    def set_operator(self, operator=''):
+        if self.operator != '':
+            self.set_value()
+        self.operator = operator
 
+    def set_value(self):
+        if self.operator == '+':
+            self.variable_one = str(float(self.variable_one) + float(self.variable_two))
+        if self.operator == '-':
+            self.variable_one = str(float(self.variable_one) - float(self.variable_two))
+        if self.operator == '×':
+            self.variable_one = str(float(self.variable_one) * float(self.variable_two))
+        if self.operator == '÷':
+            self.variable_one = str(float(self.variable_one) / float(self.variable_two))
+        self.variable_two = ''
+        self.variable_text = round(float(self.variable_one), 3)
+        display.set(self.variable_text)
+    
+    def set_value_two(self, operator):
+        if operator == 'x*2':
+            self.variable_one = str(float(self.variable_one) ** 2)
+        if operator == '√x':
+            self.variable_one = str(float(self.variable_one) ** (1/2))
+        if operator == '1/x':
+            self.variable_one = str(1 / float(self.variable_one))
+        self.variable_text = round(float(self.variable_one), 3)
+        display.set(self.variable_text)
+        
+    def set_clear(self):
+        self.variable_one = ''
+        self.variable_two = ''
+        self.variable_text = ''
+        self.symbol = ''
+        display.set(self.variable_text)
+        
     def gui_setup(self):
         main_gui.pack()
 
@@ -83,26 +90,26 @@ class GUI:
         window.configure(bg=self.bg_main)
         main_gui.configure(bg=self.bg_main)
 
-    def gui_pretty(self):
-        number = tk.Label(anchor='e', textvariable=variable_one, master=main_gui, relief='flat',
+    def gui_main(self):
+        number = tk.Label(anchor='e', textvariable=display, master=main_gui, relief='flat',
                           font=("Arial", 40, "bold"), bd=0, width=9, fg=self.bg_one,
                           bg=self.bg_main)
         destroy = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                             relief='flat', bd=0, width=20, height=2, fg=self.bg_one, bg=self.bg_five,
-                            text="CLEAR VARIABLE", command=lambda: self.clear_variable())
+                            text="CLEAR VARIABLE", command=lambda: self.set_clear())
 
         one_per_x = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                               relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_two,
-                              text="1/x", command=lambda: self.set_value('1/x'))
+                              text="1/x", command=lambda: self.set_value_two('1/x'))
         x_power_2 = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                               relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_two,
-                              text="x*2", command=lambda: self.set_value('x*2'))
+                              text="x*2", command=lambda: self.set_value_two('x*2'))
         x_root_2 = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                              relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_two,
-                             text="√x", command=lambda: self.set_value('√x'))
+                             text="√x", command=lambda: self.set_value_two('√x'))
         divide = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                            relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_two,
-                           text="÷", command=lambda: self.set_value('÷'))
+                           text="÷", command=lambda: self.set_operator('÷'))
 
         seven = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                           relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_four,
@@ -115,7 +122,7 @@ class GUI:
                          text="9", command=lambda: self.set_variable(9))
         multiply = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                              relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_two,
-                             text="×", command=lambda: self.set_value('×'))
+                             text="×", command=lambda: self.set_operator('×'))
 
         four = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                          relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_four,
@@ -128,7 +135,7 @@ class GUI:
                         text="6", command=lambda: self.set_variable(6))
         minus = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                           relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_two,
-                          text="--", command=lambda: self.set_value('-'))
+                          text="--", command=lambda: self.set_operator('-'))
 
         one = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                         relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_four,
@@ -141,7 +148,7 @@ class GUI:
                           text="3", command=lambda: self.set_variable(3))
         add = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                         relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_two,
-                        text="+", command=lambda: self.set_value('+'))
+                        text="+", command=lambda: self.set_operator('+'))
 
         plus_minus = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                                relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_four,
@@ -151,10 +158,10 @@ class GUI:
                          text="0", command=lambda: self.set_variable(0))
         dot = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                         relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_four,
-                        text=".")
+                        text=".", command=lambda: self.set_variable('.'))
         equals = tk.Button(master=main_gui, activebackground=self.bg_three, font=("Arial", 12, "bold"),
                            relief='flat', bd=0, width=7, height=2, fg=self.bg_one, bg=self.bg_five,
-                           text="=", command=lambda: self.set_value())
+                           text="=", command=lambda: self.set_operator())
 
         number.grid(column=0, row=0, columnspan=4, pady=5)
         destroy.grid(column=0, row=7, columnspan=3, pady=1)
@@ -189,10 +196,11 @@ if __name__ == "__main__":
     window = tk.Tk()
     main_gui = tk.Frame(master=window)
 
-    variable_one = tk.StringVar(main_gui)
+    display = tk.StringVar(main_gui)
 
     interface = GUI(APP_NAME)
     interface.gui_setup()
-    interface.gui_pretty()
+    interface.gui_main()
 
     window.mainloop()
+    
